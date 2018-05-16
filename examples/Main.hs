@@ -25,14 +25,14 @@ newtype Lit a = Lit Int deriving Functor
 -- if we tried to inj it into an 'Expr [Thing1, Thing2]',
 -- we would get an error message that Lit cannot be found in [Thing1, Thing2]
 lit :: (Lit :< fs) => Int -> Expr fs
-lit = In . inj . Lit
+lit = In . inject . Lit
 
 -- parens
 newtype Paren a = Paren a
   deriving Functor
 
 paren :: (Paren :< fs) => Expr fs -> Expr fs
-paren = In . inj . Paren
+paren = In . inject . Paren
 
 -- math
 data Op a
@@ -42,9 +42,9 @@ data Op a
     deriving Functor
 
 (+:), (-:), (*:) :: (Op :< fs) => Expr fs -> Expr fs -> Expr fs
-a +: b = In (inj (Add a b))
-a -: b = In (inj (Sub a b))
-a *: b = In (inj (Mul a b))
+a +: b = In (inject (Add a b))
+a -: b = In (inject (Sub a b))
+a *: b = In (inject (Mul a b))
 
 infixl 6 +:
 infixl 6 -:
