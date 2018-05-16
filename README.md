@@ -10,4 +10,4 @@ In order to achieve speed, this package makes fewer guarantees about what can be
 
 # Credits
 
-This library is built on the work of Oleg Kiselyov, which was then modified by Allele Dev. It was extracted from the [effects](https://github.com/joshvera/effects/) library.
+This library is built on the work of Oleg Kiselyov, which was then modified by Allele Dev. It was extracted from Josh Vera's [effects](https://github.com/joshvera/effects/) library. Rob Rix implemented the `ElemIndex` type family and the `Apply` typeclass.

@@ -4,9 +4,9 @@ synopsis:            A fast open-union type suitable for 100+ contained alternat
 homepage:            https://github.com/patrickt/fastsum#readme
 license:             BSD3
 license-file:        LICENSE
-author:              Patrick Thomson, Josh Vera, Allele Dev
+author:              Rob Rix, Josh Vera, Allele Dev, Patrick Thomson
 maintainer:          example@example.com
-copyright:           Patrick Thomson, Josh Vera, Allele Dev 2016
+copyright:           Rob Rix, Josh Vera, Allele Dev, Patrick Thomson 2016-2018
 category:            Data
 build-type:          Simple
 extra-source-files:  README.md
