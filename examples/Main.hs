@@ -21,18 +21,18 @@ newtype Lit a = Lit Int deriving Functor
 
 -- smart constructor. the :< is pronounced "member":
 -- what this says is that as long as Lit is a member of the type-level
--- list 'fs', we can inject it into an Expr that contains 'fs'
--- if we tried to inject it into an 'Expr [Thing1, Thing2]',
+-- list 'fs', we can inj it into an Expr that contains 'fs'
+-- if we tried to inj it into an 'Expr [Thing1, Thing2]',
 -- we would get an error message that Lit cannot be found in [Thing1, Thing2]
 lit :: (Lit :< fs) => Int -> Expr fs
-lit = In . injectSum . Lit
+lit = In . inj . Lit
 
 -- parens
 newtype Paren a = Paren a
   deriving Functor
 
 paren :: (Paren :< fs) => Expr fs -> Expr fs
-paren = In . injectSum . Paren
+paren = In . inj . Paren
 
 -- math
 data Op a
@@ -42,9 +42,9 @@ data Op a
     deriving Functor
 
 (+:), (-:), (*:) :: (Op :< fs) => Expr fs -> Expr fs -> Expr fs
-a +: b = In (injectSum (Add a b))
-a -: b = In (injectSum (Sub a b))
-a *: b = In (injectSum (Mul a b))
+a +: b = In (inj (Add a b))
+a -: b = In (inj (Sub a b))
+a *: b = In (inj (Mul a b))
 
 infixl 6 +:
 infixl 6 -:
