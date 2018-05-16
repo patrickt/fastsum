@@ -197,6 +197,8 @@ instance (Apply Show1 fs, Show a) => Show (Sum fs a) where
 
 instance Apply Hashable1 fs => Hashable1 (Sum fs) where
   liftHashWithSalt hashWithSalt salt = apply @Hashable1 (liftHashWithSalt hashWithSalt salt)
+  {-# INLINABLE liftHashWithSalt #-}
 
 instance (Apply Hashable1 fs, Hashable a) => Hashable (Sum fs a) where
   hashWithSalt = hashWithSalt1
+  {-# INLINABLE hashWithSalt #-}
