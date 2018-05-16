@@ -53,6 +53,8 @@ module Data.Sum (
 ) where
 
 import Data.Functor.Classes (Eq1(..), eq1, Ord1(..), compare1, Show1(..), showsPrec1)
+import Data.Hashable (Hashable(..))
+import Data.Hashable.Lifted (Hashable1(..), hashWithSalt1)
 import Data.Maybe (fromMaybe)
 import Data.Sum.Templates
 import GHC.Exts (Constraint)
@@ -191,3 +193,12 @@ instance Apply Show1 fs => Show1 (Sum fs) where
 instance (Apply Show1 fs, Show a) => Show (Sum fs a) where
   showsPrec = showsPrec1
   {-# INLINABLE showsPrec #-}
+
+
+instance Apply Hashable1 fs => Hashable1 (Sum fs) where
+  liftHashWithSalt hashWithSalt' salt u@(Sum n _) = salt `hashWithSalt` apply @Hashable1 (liftHashWithSalt hashWithSalt' n) u
+  {-# INLINABLE liftHashWithSalt #-}
+
+instance (Apply Hashable1 fs, Hashable a) => Hashable (Sum fs a) where
+  hashWithSalt = hashWithSalt1
+  {-# INLINABLE hashWithSalt #-}
