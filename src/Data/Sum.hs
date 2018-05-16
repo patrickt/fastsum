@@ -39,9 +39,9 @@ The data constructors of Sum are not exported.
 
 module Data.Sum (
   Sum,
-  weakenSum,
-  injectSum,
-  projectSum,
+  weaken,
+  inject,
+  project,
   type(:<),
   type(:<:),
   Element,
@@ -91,18 +91,18 @@ type family Elements ms r :: Constraint where
 type (ts :<: r) = Elements ts r
 
 -- | Inject a functor into a type-aligned sum.
-injectSum :: forall e r v. (e :< r) => e v -> Sum r v
-injectSum = unsafeInject (unP (elemNo :: P e r))
-{-# INLINE injectSum #-}
+inject :: forall e r v. (e :< r) => e v -> Sum r v
+inject = unsafeInject (unP (elemNo :: P e r))
+{-# INLINE inject #-}
 
 -- | Maybe project a functor out of a type-aligned sum.
-projectSum :: forall e r v. (e :< r) => Sum r v -> Maybe (e v)
-projectSum = unsafeProject (unP (elemNo :: P e r))
-{-# INLINE projectSum #-}
+project :: forall e r v. (e :< r) => Sum r v -> Maybe (e v)
+project = unsafeProject (unP (elemNo :: P e r))
+{-# INLINE project #-}
 
 
-weakenSum :: Sum r w -> Sum (any ': r) w
-weakenSum (Sum n v) = Sum (n+1) v
+weaken :: Sum r w -> Sum (any ': r) w
+weaken (Sum n v) = Sum (n+1) v
 
 type (Element t r) = KnownNat (ElemIndex t r)
 type (t :< r) = Element t r
