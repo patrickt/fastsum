@@ -39,11 +39,11 @@ The data constructors of Sum are not exported.
 
 module Data.Sum (
   Sum,
-  weaken,
-  inject,
-  project,
   decompose,
   decomposeLast,
+  inject,
+  project,
+  weaken,
   type(:<),
   type(:<:),
   Element,
@@ -104,11 +104,6 @@ project :: forall e r v. (e :< r) => Sum r v -> Maybe (e v)
 project = unsafeProject (unP (elemNo :: P e r))
 {-# INLINE project #-}
 
-
-weaken :: Sum r w -> Sum (any ': r) w
-weaken (Sum n v) = Sum (n+1) v
-
-
 -- | Attempts to extract the head type @e@ from a @Sum@. Returns
 -- @Right@ on success, and a @Sum@ without @e@ otherwise. You can
 -- repeatedly apply this and apply 'decomposeLast' when you have @Sum
@@ -118,14 +113,15 @@ decompose :: Sum (e ': es) b -> Either (Sum es b) (e b)
 decompose sum@(Sum n v) = maybe (Left (Sum (n - 1) v)) Right (project sum)
 {-# INLINE decompose #-}
 
-
 -- | Special case of 'decompose' which knows that there is only one
 -- possible type remaining in the @Sum@, @e@ thus it is guaranteed to
 -- return @e@
 decomposeLast :: Sum '[e] b -> e b
-decomposeLast = either (error "impossible missing sum member") id . decompose
+decomposeLast = either (error "Data.Sum: impossible case in decomposeLast") id . decompose
 {-# INLINE decomposeLast #-}
 
+weaken :: Sum r w -> Sum (any ': r) w
+weaken (Sum n v) = Sum (n+1) v
 
 type (Element t r) = KnownNat (ElemIndex t r)
 type (t :< r) = Element t r
