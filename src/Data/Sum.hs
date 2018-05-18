@@ -39,9 +39,11 @@ The data constructors of Sum are not exported.
 
 module Data.Sum (
   Sum,
-  weaken,
+  decompose,
+  decomposeLast,
   inject,
   project,
+  weaken,
   type(:<),
   type(:<:),
   Element,
@@ -102,6 +104,15 @@ project :: forall e r v. (e :< r) => Sum r v -> Maybe (e v)
 project = unsafeProject (unP (elemNo :: P e r))
 {-# INLINE project #-}
 
+-- | Try to extract the first type from the sum. On failure, return a
+-- sum that eliminates that as a possibility.
+decompose :: Sum (e ': es) b -> Either (Sum es b) (e b)
+decompose sum@(Sum n v) = maybe (Left (Sum (n - 1) v)) Right (project sum)
+
+-- | For a sum with precisely one type in the type list, we can safely
+-- project that value.
+decomposeLast :: Sum '[e] b -> e b
+decomposeLast = either (error "Data.Sum: impossible case in decomposeLast") id . decompose
 
 weaken :: Sum r w -> Sum (any ': r) w
 weaken (Sum n v) = Sum (n+1) v
