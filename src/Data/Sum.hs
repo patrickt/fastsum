@@ -104,15 +104,21 @@ project :: forall e r v. (e :< r) => Sum r v -> Maybe (e v)
 project = unsafeProject (unP (elemNo :: P e r))
 {-# INLINE project #-}
 
--- | Try to extract the first type from the sum. On failure, return a
--- sum that eliminates that as a possibility.
+-- | Attempts to extract the head type @e@ from a @Sum@. Returns
+-- @Right@ on success, and a @Sum@ without @e@ otherwise. You can
+-- repeatedly apply this and apply 'decomposeLast' when you have @Sum
+-- '[e]@ to get typesafe, exhaustive matching of an open sum. See
+-- @examples/Errors.hs@ for a full example.
 decompose :: Sum (e ': es) b -> Either (Sum es b) (e b)
 decompose sum@(Sum n v) = maybe (Left (Sum (n - 1) v)) Right (project sum)
+{-# INLINE decompose #-}
 
--- | For a sum with precisely one type in the type list, we can safely
--- project that value.
+-- | Special case of 'decompose' which knows that there is only one
+-- possible type remaining in the @Sum@, @e@ thus it is guaranteed to
+-- return @e@
 decomposeLast :: Sum '[e] b -> e b
 decomposeLast = either (error "Data.Sum: impossible case in decomposeLast") id . decompose
+{-# INLINE decomposeLast #-}
 
 weaken :: Sum r w -> Sum (any ': r) w
 weaken (Sum n v) = Sum (n+1) v
