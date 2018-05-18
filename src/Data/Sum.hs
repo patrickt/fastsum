@@ -42,6 +42,8 @@ module Data.Sum (
   weaken,
   inject,
   project,
+  decompose,
+  decomposeLast,
   type(:<),
   type(:<:),
   Element,
@@ -105,6 +107,25 @@ project = unsafeProject (unP (elemNo :: P e r))
 
 weaken :: Sum r w -> Sum (any ': r) w
 weaken (Sum n v) = Sum (n+1) v
+
+
+-- | Attempts to extract the head type @e@ from a @Sum@. Returns
+-- @Right@ on success, and a @Sum@ without @e@ otherwise. You can
+-- repeatedly apply this and apply 'decomposeLast' when you have @Sum
+-- '[e]@ to get typesafe, exhaustive matching of an open sum. See
+-- @examples/Errors.hs@ for a full example.
+decompose :: Sum (e ': es) b -> Either (Sum es b) (e b)
+decompose sum@(Sum n v) = maybe (Left (Sum (n - 1) v)) Right (project sum)
+{-# INLINE decompose #-}
+
+
+-- | Special case of 'decompose' which knows that there is only one
+-- possible type remaining in the @Sum@, @e@ thus it is guaranteed to
+-- return @e@
+decomposeLast :: Sum '[e] b -> e b
+decomposeLast = either (error "impossible missing sum member") id . decompose
+{-# INLINE decomposeLast #-}
+
 
 type (Element t r) = KnownNat (ElemIndex t r)
 type (t :< r) = Element t r
