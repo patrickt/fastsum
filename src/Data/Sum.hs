@@ -46,7 +46,6 @@ module Data.Sum (
   type(:<:),
   Element,
   ElemIndex,
-  elemIndex,
   Elements,
   Apply(..),
   apply',
@@ -110,9 +109,6 @@ weaken (Sum n v) = Sum (n+1) v
 
 type (Element t r) = KnownNat (ElemIndex t r)
 type (t :< r) = Element t r
-
-elemIndex :: Sum r w -> Int
-elemIndex (Sum n _) = n
 
 -- Find an index of an element in an `r'.
 -- The element must exist, so this is essentially a compile-time computation.
