@@ -47,6 +47,7 @@ module Data.Sum (
   type(:<),
   type(:<:),
   Element,
+  ElemIndex,
   Elements,
   Apply(..),
   apply',
