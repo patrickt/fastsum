@@ -66,10 +66,10 @@ pure [mkElemIndexTypeFamily 150]
 infixr 5 :<
 
 -- | The fundamental sum type over a type-level list of products @r@
--- and an annotation type @v@. The constructors are not exported;
+-- and an annotation type @v@. The constructor is not exported;
 -- use 'inject' to create a 'Sum'.
 data Sum (r :: [ * -> * ]) (v :: *) where
-  -- Strong Sum (Existential with the evidence) is an open sum
+  -- | Strong Sum (Existential with the evidence) is an open sum
   -- t is can be a GADT and hence not necessarily a Functor.
   -- Int is the index of t in the list r; that is, the index of t in the
   -- universe r.
@@ -141,6 +141,11 @@ elemNo = P (fromIntegral (natVal' (proxy# :: Proxy# (ElemIndex t r))))
 
 -- | Helper to apply a function to a functor of the nth type in a type list.
 -- An @Apply SomeClass fs@ instance means that @Sum fs@ has an instance of @SomeClass@.
+-- Instances are written using 'apply' and an explicit type application:
+--
+-- > instance Apply SomeClass fs => SomeClass (Sum fs) where method = apply @SomeClass method
+--
+-- An @INLINEABLE@ pragma on such an instance may improve dispatch speed.
 class Apply (c :: (* -> *) -> Constraint) (fs :: [* -> *]) where
   apply :: (forall g . c g => g a -> b) -> Sum fs a -> b
 
