@@ -5,12 +5,29 @@ homepage:            https://github.com/patrickt/fastsum#readme
 license:             BSD3
 license-file:        LICENSE
 author:              Rob Rix, Josh Vera, Allele Dev, Patrick Thomson
-maintainer:          example@example.com
+maintainer:          patrickt@github.com
 copyright:           Rob Rix, Josh Vera, Allele Dev, Patrick Thomson 2016-2018
 category:            Data
 build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
+tested-with:         GHC == 8.2.2
+description:
+            This package provides Data.Sum, an open-union type, similar to the Union type
+            that powers the implementation of Oleg Kiselyov's extensible-effects library.
+            .
+            Unlike most open-union implementations, this type is very fast to compile,
+            even when the type-level list of alternatives contains hundreds of entries.
+            Membership queries are constant-time, compiling to a single type-level natural
+            lookup in a closed type family, unlike the traditional encoding of Union,
+            which relies on recursive typeclass lookups. As such, this type lends itself
+            to representing abstract syntax trees or other rich data structures.
+            .
+            This project is safe to use in production. Any performance problems at
+            compile-time or runtime should be filed as bugs.
+
+flag build-examples
+  default: False
 
 library
   hs-source-dirs:      src
@@ -27,6 +44,8 @@ executable example
   main-is:          Main.hs
   build-depends:    base, fastsum
   default-language: Haskell2010
+  if !flag(build-examples)
+     buildable: False
 
 source-repository head
   type:     git
