@@ -64,7 +64,7 @@ import GHC.Prim (Proxy#, proxy#)
 import GHC.TypeLits
 import Unsafe.Coerce(unsafeCoerce)
 
-pure [mkElemIndexTypeFamily 150]
+pure [mkElemIndexTypeFamily 200]
 
 infixr 5 :<
 
@@ -139,7 +139,7 @@ apply2' f u@(Sum n1 _) (Sum n2 r2)
   | otherwise = Nothing
 {-# INLINABLE apply2' #-}
 
-pure (mkApplyInstance <$> [1..150])
+pure (mkApplyInstance <$> [1..200])
 
 
 instance Apply Foldable fs => Foldable (Sum fs) where
