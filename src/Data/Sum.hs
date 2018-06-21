@@ -9,6 +9,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE MagicHash #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# OPTIONS_HADDOCK prune, ignore-exports #-}
 
 {-|
 Module      : Data.Sum
@@ -19,40 +20,36 @@ Maintainer  : allele.dev@gmail.com
 Stability   : experimental
 Portability : POSIX
 
-All operations are constant-time, and there is no Typeable constraint
+All operations are constant-time, and there is no Typeable constraint.
 
-This is a variation of OpenUnion5.hs, which relies on overlapping
-instances instead of closed type families. Closed type families
-have their problems: overlapping instances can resolve even
-for unground types, but closed type families are subject to a
-strict apartness condition.
-
-This implementation is very similar to OpenUnion1.hs, but without
-the annoying Typeable constraint. We sort of emulate it:
-
-Our list r of open sum components is a small Universe.
-Therefore, we can use the Typeable-like evidence in that
-universe.
-
-The data constructors of Sum are not exported.
+This is a variation of Kiselyov's OpenUnion5.hs, which relies on
+overlapping instances instead of closed type families. Closed type
+families have their problems: overlapping instances can resolve even
+for unground types, but closed type families are subject to a strict
+apartness condition.
 -}
 
-module Data.Sum (
-  Sum,
-  weaken,
-  inject,
-  project,
-  type(:<),
-  type(:<:),
-  Element,
-  ElemIndex,
-  elemIndex,
-  Elements,
-  Apply(..),
-  apply',
-  apply2,
-  apply2'
-) where
+module Data.Sum
+  ( -- * The fundamental sum-of-products type
+    Sum
+  -- * Creating and extracting sums from products
+  , inject
+  , project
+  -- * Operating on sums' effects lists
+  , decompose
+  , decomposeLast
+  , weaken
+  -- * Membership prodicates
+  , Element
+  , type(:<)
+  , Elements
+  , type(:<:)
+  , ElemIndex
+  -- * Typeclass application.
+  , Apply(..)
+  , apply'
+  , apply2
+  ) where
 
 import Data.Functor.Classes (Eq1(..), eq1, Ord1(..), compare1, Show1(..), showsPrec1)
 import Data.Hashable (Hashable(..))
@@ -68,11 +65,14 @@ pure [mkElemIndexTypeFamily 200]
 
 infixr 5 :<
 
--- Strong Sum (Existential with the evidence) is an open sum
--- t is can be a GADT and hence not necessarily a Functor.
--- Int is the index of t in the list r; that is, the index of t in the
--- universe r.
+-- | The fundamental sum type over a type-level list of products @r@
+-- and an annotation type @v@. The constructor is not exported;
+-- use 'inject' to create a 'Sum'.
 data Sum (r :: [ * -> * ]) (v :: *) where
+  -- | Strong Sum (Existential with the evidence) is an open sum
+  -- t is can be a GADT and hence not necessarily a Functor.
+  -- Int is the index of t in the list r; that is, the index of t in the
+  -- universe r.
   Sum :: {-# UNPACK #-} !Int -> t v -> Sum r v
 
 unsafeInject :: Int -> t v -> Sum r v
@@ -87,11 +87,13 @@ unsafeProject n (Sum n' x) | n == n'   = Just (unsafeCoerce x)
 newtype P (t :: * -> *) (r :: [* -> *]) = P { unP :: Int }
 
 infixr 5 :<:
--- | Find a list of members 'ms' in an open sum 'r'.
-type family Elements ms r :: Constraint where
+-- | An @Elements ms r@ constraint proves that @r@ contains
+-- all of the elements in @ms@.
+type family Elements (ms :: [* -> *]) r :: Constraint where
   Elements (t ': cs) r = (Element t r, Elements cs r)
   Elements '[] r = ()
 
+-- | An infix synonym for 'Elements'.
 type (ts :<: r) = Elements ts r
 
 -- | Inject a functor into a type-aligned sum.
@@ -104,15 +106,33 @@ project :: forall e r v. (e :< r) => Sum r v -> Maybe (e v)
 project = unsafeProject (unP (elemNo :: P e r))
 {-# INLINE project #-}
 
+-- | Attempts to extract the head type @e@ from a @Sum@. Returns
+-- @Right@ on success, and a @Sum@ without @e@ otherwise. You can
+-- repeatedly apply this and apply 'decomposeLast' when you have @Sum
+-- '[e]@ to get typesafe, exhaustive matching of an open sum. See
+-- @examples/Errors.hs@ for a full example.
+decompose :: Sum (e ': es) b -> Either (Sum es b) (e b)
+decompose sum@(Sum n v) = maybe (Left (Sum (n - 1) v)) Right (project sum)
+{-# INLINE decompose #-}
 
+-- | Special case of 'decompose' which knows that there is only one
+-- possible type remaining in the @Sum@, @e@ thus it is guaranteed to
+-- return @e@
+decomposeLast :: Sum '[e] b -> e b
+decomposeLast = either (error "Data.Sum: impossible case in decomposeLast") id . decompose
+{-# INLINE decomposeLast #-}
+
+-- | Add an arbitrary product @any@ to a product list @r@.
 weaken :: Sum r w -> Sum (any ': r) w
 weaken (Sum n v) = Sum (n+1) v
 
+-- | @Element t r@ is a proof that @t@ is a member of @r@. This is implemented
+-- in terms of @KnownNat@ rather than recursive typeclass lookups.
 type (Element t r) = KnownNat (ElemIndex t r)
-type (t :< r) = Element t r
 
-elemIndex :: Sum r w -> Int
-elemIndex (Sum n _) = n
+-- | An infix version of 'Element'. Note that you will need @-XTypeOperators@
+-- turned on to use this.
+type (t :< r) = Element t r
 
 -- Find an index of an element in an `r'.
 -- The element must exist, so this is essentially a compile-time computation.
@@ -120,6 +140,12 @@ elemNo :: forall t r . (t :< r) => P t r
 elemNo = P (fromIntegral (natVal' (proxy# :: Proxy# (ElemIndex t r))))
 
 -- | Helper to apply a function to a functor of the nth type in a type list.
+-- An @Apply SomeClass fs@ instance means that @Sum fs@ has an instance of @SomeClass@.
+-- Instances are written using 'apply' and an explicit type application:
+--
+-- > instance Apply SomeClass fs => SomeClass (Sum fs) where method = apply @SomeClass method
+--
+-- An @INLINEABLE@ pragma on such an instance may improve dispatch speed.
 class Apply (c :: (* -> *) -> Constraint) (fs :: [* -> *]) where
   apply :: (forall g . c g => g a -> b) -> Sum fs a -> b
 
