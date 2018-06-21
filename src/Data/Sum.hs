@@ -49,6 +49,7 @@ module Data.Sum
   , Apply(..)
   , apply'
   , apply2
+  , apply2'
   ) where
 
 import Data.Functor.Classes (Eq1(..), eq1, Ord1(..), compare1, Show1(..), showsPrec1)
