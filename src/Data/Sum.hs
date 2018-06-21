@@ -45,6 +45,7 @@ module Data.Sum
   , Elements
   , type(:<:)
   , ElemIndex
+  , elemIndex
   -- * Typeclass application.
   , Apply(..)
   , apply'
@@ -134,6 +135,9 @@ type (Element t r) = KnownNat (ElemIndex t r)
 -- | An infix version of 'Element'. Note that you will need @-XTypeOperators@
 -- turned on to use this.
 type (t :< r) = Element t r
+
+elemIndex :: Sum r w -> Int
+elemIndex (Sum n _) = n
 
 -- Find an index of an element in an `r'.
 -- The element must exist, so this is essentially a compile-time computation.
