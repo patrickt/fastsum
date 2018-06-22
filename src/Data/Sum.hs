@@ -45,10 +45,12 @@ module Data.Sum
   , Elements
   , type(:<:)
   , ElemIndex
+  , elemIndex
   -- * Typeclass application.
   , Apply(..)
   , apply'
   , apply2
+  , apply2'
   ) where
 
 import Data.Functor.Classes (Eq1(..), eq1, Ord1(..), compare1, Show1(..), showsPrec1)
@@ -61,7 +63,7 @@ import GHC.Prim (Proxy#, proxy#)
 import GHC.TypeLits
 import Unsafe.Coerce(unsafeCoerce)
 
-pure [mkElemIndexTypeFamily 150]
+pure [mkElemIndexTypeFamily 200]
 
 infixr 5 :<
 
@@ -134,6 +136,9 @@ type (Element t r) = KnownNat (ElemIndex t r)
 -- turned on to use this.
 type (t :< r) = Element t r
 
+elemIndex :: Sum r w -> Int
+elemIndex (Sum n _) = n
+
 -- Find an index of an element in an `r'.
 -- The element must exist, so this is essentially a compile-time computation.
 elemNo :: forall t r . (t :< r) => P t r
@@ -165,7 +170,7 @@ apply2' f u@(Sum n1 _) (Sum n2 r2)
   | otherwise = Nothing
 {-# INLINABLE apply2' #-}
 
-pure (mkApplyInstance <$> [1..150])
+pure (mkApplyInstance <$> [1..200])
 
 
 instance Apply Foldable fs => Foldable (Sum fs) where
