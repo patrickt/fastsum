@@ -1,5 +1,5 @@
 name:                fastsum
-version:             0.1.0.0
+version:             0.1.1.0
 synopsis:            A fast open-union type suitable for 100+ contained alternatives
 homepage:            https://github.com/patrickt/fastsum#readme
 license:             BSD3

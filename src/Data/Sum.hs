@@ -35,6 +35,7 @@ module Data.Sum
   -- * Creating and extracting sums from products
   , inject
   , project
+  , projectGuard
   -- * Operating on sums' effects lists
   , decompose
   , decomposeLast
@@ -53,6 +54,7 @@ module Data.Sum
   , apply2'
   ) where
 
+import Control.Applicative (Alternative (..))
 import Data.Functor.Classes (Eq1(..), eq1, Ord1(..), compare1, Show1(..), showsPrec1)
 import Data.Hashable (Hashable(..))
 import Data.Hashable.Lifted (Hashable1(..), hashWithSalt1)
@@ -107,6 +109,10 @@ inject = unsafeInject (unP (elemNo :: P e r))
 project :: forall e r v. (e :< r) => Sum r v -> Maybe (e v)
 project = unsafeProject (unP (elemNo :: P e r))
 {-# INLINE project #-}
+
+-- | As 'project', but generalized to any 'Alternative' functor.
+projectGuard :: forall m e r v . (Alternative m, e :< r) => Sum r v -> m (e v)
+projectGuard = maybe empty pure . project
 
 -- | Attempts to extract the head type @e@ from a @Sum@. Returns
 -- @Right@ on success, and a @Sum@ without @e@ otherwise. You can
