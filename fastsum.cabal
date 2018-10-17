@@ -34,6 +34,7 @@ library
   exposed-modules:     Data.Sum
   other-modules:       Data.Sum.Templates
   build-depends:       base >= 4.7 && < 5
+                     , deepseq
                      , ghc-prim
                      , hashable
                      , template-haskell

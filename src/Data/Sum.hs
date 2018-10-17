@@ -55,6 +55,7 @@ module Data.Sum
   ) where
 
 import Control.Applicative (Alternative (..))
+import Control.DeepSeq (NFData(..), NFData1(..))
 import Data.Functor.Classes (Eq1(..), eq1, Ord1(..), compare1, Show1(..), showsPrec1)
 import Data.Hashable (Hashable(..))
 import Data.Hashable.Lifted (Hashable1(..), hashWithSalt1)
@@ -244,3 +245,11 @@ instance Apply Hashable1 fs => Hashable1 (Sum fs) where
 instance (Apply Hashable1 fs, Hashable a) => Hashable (Sum fs a) where
   hashWithSalt = hashWithSalt1
   {-# INLINABLE hashWithSalt #-}
+
+instance Apply NFData1 fs => NFData1 (Sum fs) where
+  liftRnf rnf' u@(Sum n _) = apply @NFData1 (liftRnf rnf') u
+  {-# INLINABLE liftRnf #-}
+
+instance (Apply NFData1 fs, NFData a) => NFData (Sum fs a) where
+  rnf u@(Sum n _) = rnf n `seq` liftRnf rnf u
+  {-# INLINABLE rnf #-}
