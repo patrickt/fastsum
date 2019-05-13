@@ -10,8 +10,11 @@ copyright:           Rob Rix, Josh Vera, Allele Dev, Patrick Thomson 2016-2018
 category:            Data
 build-type:          Simple
 extra-source-files:  README.md
+                     ChangeLog.md
 cabal-version:       >=1.10
 tested-with:         GHC == 8.2.2
+                     GHC == 8.4.3
+                     GHC == 8.6.3
 description:
             This package provides Data.Sum, an open-union type, similar to the Union type
             that powers the implementation of Oleg Kiselyov's extensible-effects library.
