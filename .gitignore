@@ -2,3 +2,4 @@
 .stack-work-profiling
 .DS_Store
 dist
+dist-newstyle
