@@ -11,30 +11,40 @@ import Unsafe.Coerce (unsafeCoerce)
 
 mkElemIndexTypeFamily :: Integer -> Dec
 mkElemIndexTypeFamily paramN =
-  ClosedTypeFamilyD (TypeFamilyHead elemIndex [KindedTV t functorK, KindedTV ts (AppT ListT functorK)] (KindSig (ConT nat)) Nothing) ((mkEquation <$> [0..pred paramN]) ++ errorCase)
+  ClosedTypeFamilyD
+    ( TypeFamilyHead
+        elemIndex
+        [ KindedTV t functorK
+        , KindedTV ts (AppT ListT functorK)
+        ]
+        (KindSig (ConT nat))
+        Nothing
+    )
+    ((mkEquation <$> [0..pred paramN]))
   where [elemIndex, t, ts, nat] = mkName <$> ["ElemIndex", "t", "ts", "Nat"]
         functorK = AppT (AppT ArrowT StarT) StarT
         mkT = VarT . mkName . ('t' :) . show
-        mkEquation i = TySynEqn (Just [ mkT i, typeListT WildCardT (mkT <$> [0..i]) ]) (LitT (NumTyLit i))
+        mkEquation i = TySynEqn Nothing (lhsMatch i) (LitT (NumTyLit i))
+        lhsMatch i = AppT (AppT (ConT elemIndex) (mkT i)) (typeListT WildCardT (mkT <$> [0..i]))
         typeErrN = mkName "TypeError"
         textN = mkName "Text"
         next = mkName ":<>:"
         above = mkName ":$$:"
         shw = mkName "ShowType"
-        errorCase = [ TySynEqn
-                      (Just [ PlainTV t , PlainTV ts ])
-                        (AppT
-                         (ConT typeErrN)
-                         (AppT
-                          (AppT (PromotedT above)
-                           (AppT (AppT (PromotedT next)
-                                  (AppT (AppT
-                                         (PromotedT next)
-                                         (AppT (PromotedT textN) (LitT (StrTyLit "'"))))
-                                               (AppT (PromotedT shw) (VarT t))))
-                           (AppT (PromotedT textN) (LitT (StrTyLit "' is not a member of the type-level list")))))
-                          (AppT (PromotedT shw) (VarT ts))))
-                    ]
+        -- errorCase = [ TySynEqn
+        --               (Just [ PlainTV t , PlainTV ts ])
+        --                 (AppT
+        --                  (ConT typeErrN)
+        --                  (AppT
+        --                   (AppT (PromotedT above)
+        --                    (AppT (AppT (PromotedT next)
+        --                           (AppT (AppT
+        --                                  (PromotedT next)
+        --                                  (AppT (PromotedT textN) (LitT (StrTyLit "'"))))
+        --                                        (AppT (PromotedT shw) (VarT t))))
+        --                    (AppT (PromotedT textN) (LitT (StrTyLit "' is not a member of the type-level list")))))
+        --                   (AppT (PromotedT shw) (VarT ts))))
+        --             ]
 
 
 mkApplyInstance :: Integer -> Dec
