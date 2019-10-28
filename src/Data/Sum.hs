@@ -66,7 +66,7 @@ import GHC.Prim (Proxy#, proxy#)
 import GHC.TypeLits
 import Unsafe.Coerce(unsafeCoerce)
 
-mkElemIndexTypeFamily 5
+mkElemIndexTypeFamily 200
 
 infixr 5 :<
 
