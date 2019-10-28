@@ -9,8 +9,8 @@ module Data.Sum.Templates
 import Language.Haskell.TH
 import Unsafe.Coerce (unsafeCoerce)
 
-mkElemIndexTypeFamily :: Integer -> Dec
-mkElemIndexTypeFamily paramN =
+mkElemIndexTypeFamily :: Integer -> DecsQ
+mkElemIndexTypeFamily paramN = pure . pure $
   ClosedTypeFamilyD
     ( TypeFamilyHead
         elemIndex
