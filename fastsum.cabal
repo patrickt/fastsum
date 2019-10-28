@@ -1,8 +1,10 @@
+cabal-version:       2.4
+
 name:                fastsum
-version:             0.1.1.0
+version:             0.2.0.0
 synopsis:            A fast open-union type suitable for 100+ contained alternatives
 homepage:            https://github.com/patrickt/fastsum#readme
-license:             BSD3
+license:             BSD-3-Clause
 license-file:        LICENSE
 author:              Rob Rix, Josh Vera, Allele Dev, Patrick Thomson
 maintainer:          patrickt@github.com
@@ -11,7 +13,6 @@ category:            Data
 build-type:          Simple
 extra-source-files:  README.md
                      ChangeLog.md
-cabal-version:       >=1.10
 tested-with:         GHC == 8.2.2
                      GHC == 8.4.3
                      GHC == 8.6.3
@@ -40,7 +41,7 @@ library
                      , deepseq >= 1.4 && <2
                      , ghc-prim >= 0.5 && <1
                      , hashable >= 1.2 && <2
-                     , template-haskell >= 2.12 && <3
+                     , template-haskell ^>= 2.15
   default-language:    Haskell2010
 
 executable example
