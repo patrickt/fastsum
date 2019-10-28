@@ -15,14 +15,14 @@ mkElemIndexTypeFamily paramN =
   where [elemIndex, t, ts, nat] = mkName <$> ["ElemIndex", "t", "ts", "Nat"]
         functorK = AppT (AppT ArrowT StarT) StarT
         mkT = VarT . mkName . ('t' :) . show
-        mkEquation i = TySynEqn [ mkT i, typeListT WildCardT (mkT <$> [0..i]) ] (LitT (NumTyLit i))
+        mkEquation i = TySynEqn (Just [ mkT i, typeListT WildCardT (mkT <$> [0..i]) ]) (LitT (NumTyLit i))
         typeErrN = mkName "TypeError"
         textN = mkName "Text"
         next = mkName ":<>:"
         above = mkName ":$$:"
         shw = mkName "ShowType"
         errorCase = [ TySynEqn
-                      [ VarT t , VarT ts ]
+                      (Just [ PlainTV t , PlainTV ts ])
                         (AppT
                          (ConT typeErrN)
                          (AppT
