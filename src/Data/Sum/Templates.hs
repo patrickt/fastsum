@@ -7,8 +7,10 @@ module Data.Sum.Templates
 ) where
 
 import Control.Monad
+import Data.Kind
 import Data.Traversable
-import Language.Haskell.TH
+import Language.Haskell.TH hiding (Type)
+import qualified Language.Haskell.TH as TH (Type)
 import Language.Haskell.TH.Quote
 import Unsafe.Coerce (unsafeCoerce)
 import GHC.TypeLits
@@ -34,7 +36,7 @@ mkElemIndexTypeFamily paramN = do
       -- Helper for building more readable type names rather than verbose gensyms
       mkT = pure . VarT . mkName . ('t' :) . show
       -- We want to make the kind signatures explicit here.
-      binders = [kindedTV t  <$> [t| * -> *   |] , kindedTV ts <$> [t| [* -> *] |] ]
+      binders = [kindedTV t  <$> [t| Type -> Type |] , kindedTV ts <$> [t| [Type -> Type] |] ]
       -- This family ends up returning a Nat.
       resultKind = kindSig <$> [t| Nat |]
       -- We have to build n ElemIndex entries.
@@ -79,5 +81,5 @@ mkApplyInstance paramN =
           (NormalB (AppE (VarE f) (SigE (AppE (VarE 'unsafeCoerce) (VarE r)) (AppT nthType a))))
           []
 
-typeListT :: Type -> [Type] -> Type
+typeListT :: TH.Type -> [TH.Type] -> TH.Type
 typeListT = foldr (AppT . AppT PromotedConsT)
