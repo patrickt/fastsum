@@ -39,16 +39,24 @@ mkElemIndexTypeFamily paramN = do
       resultKind = kindSig <$> [t| Nat |]
       -- We have to build n ElemIndex entries.
       equations = fmap buildEquation [0..pred paramN] ++ [errorCase]
-      -- Constructs a single family instance equation
-      buildEquation n = tySynEqn Nothing (lhsMatch n) . litT . numTyLit $ n
-      -- Make a type of the form 'ElemIndex n (n ': n0 : _)
-      lhsMatch n = [t| $(conT elemIndex) $(mkT n) $(typeListT WildCardT <$> (traverse mkT [0..n])) |]
-      -- Descriptive error case for bad lookups.
-      errorCase = tySynEqn Nothing [t| $(conT elemIndex) $(varT t) $(varT ts) |] [t|
-        TypeError ('Text "'" ':$$: ('ShowType $(varT t)) ':$$:
+      errorBody = [t|
+        TypeError ('Text "'" ':<>: ('ShowType $(varT t)) ':<>:
                    'Text "' is not a member of the type-level list" ':$$:
                    'ShowType $(varT ts))
-         |]
+        |]
+      -- The tySynEqn API changed in 2.15 so we need a guard here.
+      -- buildEquation a single family instance equation; it uses lhsMatch
+      -- to do so, making a type of the form 'ElemIndex n (n ': n0 : _)
+      -- errorCase is invoked above to provide a readable error
+#if MIN_VERSION_template_haskell(2,15,0)
+      buildEquation n = tySynEqn Nothing (lhsMatch n) . litT . numTyLit $ n
+      lhsMatch n = [t| $(conT elemIndex) $(mkT n) $(typeListT WildCardT <$> traverse mkT [0..n]) |]
+      errorCase = tySynEqn Nothing [t| $(conT elemIndex) $(varT t) $(varT ts) |] errorBody
+#else
+      buildEquation n = tySynEqn (lhsMatch n) (litT . numTyLit $ n)
+      lhsMatch n = [mkT n, typeListT WildCardT <$> traverse mkT [0..n] ]
+      errorCase = tySynEqn [varT t, varT ts] errorBody
+#endif
 
   result <- closedTypeFamilyD elemIndex
     <$> sequenceA binders
