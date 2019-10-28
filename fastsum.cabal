@@ -16,6 +16,7 @@ extra-source-files:  README.md
 tested-with:         GHC == 8.2.2
                      GHC == 8.4.3
                      GHC == 8.6.3
+                     GHC == 8.8.1
 description:
             This package provides Data.Sum, an open-union type, similar to the Union type
             that powers the implementation of Oleg Kiselyov's extensible-effects library.
