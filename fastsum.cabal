@@ -17,6 +17,8 @@ tested-with:         GHC == 8.2.2
                      GHC == 8.4.3
                      GHC == 8.6.3
                      GHC == 8.8.1
+                     GHC == 8.10.4
+                     GHC == 9.0.1
 description:
             This package provides Data.Sum, an open-union type, similar to the Union type
             that powers the implementation of Oleg Kiselyov's extensible-effects library.
@@ -42,7 +44,7 @@ library
                      , deepseq >= 1.4 && <2
                      , ghc-prim >= 0.5 && <1
                      , hashable >= 1.2 && <2
-                     , template-haskell >= 2.12 && < 2.17
+                     , template-haskell >= 2.12 && < 2.18
   default-language:    Haskell2010
 
 executable examples
