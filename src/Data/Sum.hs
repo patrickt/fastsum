@@ -238,11 +238,11 @@ instance (Apply Show1 fs, Show a) => Show (Sum fs a) where
   {-# INLINABLE showsPrec #-}
 
 
-instance Apply Hashable1 fs => Hashable1 (Sum fs) where
+instance (Apply Eq1 fs, Apply Hashable1 fs) => Hashable1 (Sum fs) where
   liftHashWithSalt hashWithSalt' salt u@(Sum n _) = salt `hashWithSalt` apply @Hashable1 (liftHashWithSalt hashWithSalt' n) u
   {-# INLINABLE liftHashWithSalt #-}
 
-instance (Apply Hashable1 fs, Hashable a) => Hashable (Sum fs a) where
+instance (Apply Eq1 fs, Apply Hashable1 fs, Hashable a) => Hashable (Sum fs a) where
   hashWithSalt = hashWithSalt1
   {-# INLINABLE hashWithSalt #-}
 

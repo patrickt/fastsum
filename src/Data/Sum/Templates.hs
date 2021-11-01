@@ -77,7 +77,11 @@ mkApplyInstance paramN =
         [applyC, apply, f, r, union] = mkName <$> ["Apply", "apply", "f", "r", "Sum"]
         [constraint, a] = VarT . mkName <$> ["constraint", "a"]
         mkClause i nthType = Clause
+#if MIN_VERSION_template_haskell(2,18,0)
+          [ VarP f, ConP union [] [ LitP (IntegerL i), VarP r ] ]
+#else
           [ VarP f, ConP union [ LitP (IntegerL i), VarP r ] ]
+#endif
           (NormalB (AppE (VarE f) (SigE (AppE (VarE 'unsafeCoerce) (VarE r)) (AppT nthType a))))
           []
 
