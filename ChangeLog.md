@@ -1,3 +1,7 @@
+# v0.1.1.2
+
+Enable use of `template-haskell` versions >= 2.19.
+
 # v0.1.1.1
 
 Enable use of `template-haskell` versions >= 2.15.

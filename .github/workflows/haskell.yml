@@ -5,17 +5,16 @@ on: [pull_request]
 jobs:
   build:
     name: ghc ${{ matrix.ghc }}
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        ghc: ["8.2.2", "8.4.4", "8.6.5", "8.8.1"]
-        cabal: ["3.0"]
+        ghc: ["8.2.2", "8.4.4", "8.6.5", "8.8.1", "8.10.7", "9.2.1"]
+        cabal: ["3.6"]
 
     steps:
-    - uses: actions/checkout@master
-      if: github.event.action == 'opened' || github.event.action == 'synchronize'
+    - uses: actions/checkout@v2
 
-    - uses: actions/setup-haskell@v1
+    - uses: haskell/actions/setup@v1
       name: Setup Haskell
       with:
         ghc-version: ${{ matrix.ghc }}
