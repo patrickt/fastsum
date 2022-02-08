@@ -1,6 +1,8 @@
-# v0.1.1.2
+# v0.2.0.0
 
-Enable use of `template-haskell` versions >= 2.19.
+Support GHC 9.2 by enabling use of `template-haskell` versions >= 2.19.
+
+Add an `Eq1` constraint to the `Hashable1` constraint to satisfy newer `hashable` versions.
 
 # v0.1.1.1
 
