@@ -39,6 +39,7 @@ flag build-examples
 library
   hs-source-dirs:      src
   exposed-modules:     Data.Sum
+                       Data.Sum.Populate
   other-modules:       Data.Sum.Templates
   build-depends:       base >= 4.7 && < 5
                      , deepseq >= 1.4 && <2
